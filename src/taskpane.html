@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>電子印鑑</title>
+
+  <!-- Office.js CDN -->
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Meiryo", "Yu Gothic", "Hiragino Sans", sans-serif;
+      background: #fafafa;
+      color: #333;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+      color: #b71c1c;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #555;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #b71c1c;
+    }
+
+    .btn-stamp {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 16px;
+      font-size: 15px;
+      font-weight: bold;
+      color: #fff;
+      background: #c62828;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-stamp:hover { background: #b71c1c; }
+    .btn-stamp:active { background: #8e0000; }
+    .btn-stamp:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .preview-area {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .preview-area p {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    #preview-canvas {
+      border: 1px dashed #ddd;
+      border-radius: 50%;
+    }
+
+    #status {
+      margin-top: 12px;
+      font-size: 12px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    .status-success { color: #2e7d32; }
+    .status-error { color: #c62828; }
+  </style>
+</head>
+<body>
+  <h1>&#x2764; 電子印鑑（データ印）</h1>
+
+  <div class="form-group">
+    <label for="top-text">上段（苗字など）</label>
+    <input type="text" id="top-text" value="山田" maxlength="6" />
+  </div>
+
+  <div class="form-group">
+    <label for="mid-text">中段（日付 YYYY/MM/DD）</label>
+    <input type="text" id="mid-text" maxlength="10" />
+  </div>
+
+  <div class="form-group">
+    <label for="bottom-text">下段（部署名など・空欄可）</label>
+    <input type="text" id="bottom-text" value="" maxlength="6" placeholder="例：営業部" />
+  </div>
+
+  <button class="btn-stamp" id="btn-stamp" disabled>押 印</button>
+
+  <div id="status"></div>
+
+  <div class="preview-area">
+    <p>プレビュー</p>
+    <canvas id="preview-canvas" width="200" height="200"></canvas>
+  </div>
+
+  <script src="taskpane.js"></script>
+</body>
+</html>
