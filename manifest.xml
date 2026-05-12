@@ -7,17 +7,19 @@
   xsi:type="TaskPaneApp">
 
   <Id>a1b2c3d4-e5f6-7890-abcd-ef1234567890</Id>
-  <Version>1.0.0.0</Version>
+  <Version>1.1.0.0</Version>
   <ProviderName>Hanko Add-in Developer</ProviderName>
   <DefaultLocale>ja-jp</DefaultLocale>
   <DisplayName DefaultValue="電子印鑑 (Hanko)" />
-  <Description DefaultValue="日本式のデータ印（電子印鑑）をExcelに挿入するアドインです。" />
+  <Description DefaultValue="日本式のデータ印（電子印鑑）をExcel・Word・PowerPointに挿入するアドインです。" />
   <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png" />
   <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png" />
   <SupportUrl DefaultValue="https://localhost:3000" />
 
   <Hosts>
     <Host Name="Workbook" />
+    <Host Name="Document" />
+    <Host Name="Presentation" />
   </Hosts>
 
   <DefaultSettings>
@@ -28,6 +30,7 @@
 
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
     <Hosts>
+      <!-- ========== Excel ========== -->
       <Host xsi:type="Workbook">
         <DesktopFormFactor>
           <GetStarted>
@@ -37,14 +40,92 @@
           </GetStarted>
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <OfficeTab id="TabHome">
-              <Group id="HankoGroup">
+              <Group id="HankoGroup.Excel">
                 <Label resid="HankoGroup.Label" />
                 <Icon>
                   <bt:Image size="16" resid="Icon.16x16" />
                   <bt:Image size="32" resid="Icon.32x32" />
                   <bt:Image size="80" resid="Icon.80x80" />
                 </Icon>
-                <Control xsi:type="Button" id="HankoButton">
+                <Control xsi:type="Button" id="HankoButton.Excel">
+                  <Label resid="HankoButton.Label" />
+                  <Supertip>
+                    <Title resid="HankoButton.Label" />
+                    <Description resid="HankoButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16" />
+                    <bt:Image size="32" resid="Icon.32x32" />
+                    <bt:Image size="80" resid="Icon.80x80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>HankoTaskPane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+
+      <!-- ========== Word ========== -->
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title" />
+            <Description resid="GetStarted.Description" />
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl" />
+          </GetStarted>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="HankoGroup.Word">
+                <Label resid="HankoGroup.Label" />
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16" />
+                  <bt:Image size="32" resid="Icon.32x32" />
+                  <bt:Image size="80" resid="Icon.80x80" />
+                </Icon>
+                <Control xsi:type="Button" id="HankoButton.Word">
+                  <Label resid="HankoButton.Label" />
+                  <Supertip>
+                    <Title resid="HankoButton.Label" />
+                    <Description resid="HankoButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16" />
+                    <bt:Image size="32" resid="Icon.32x32" />
+                    <bt:Image size="80" resid="Icon.80x80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>HankoTaskPane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+
+      <!-- ========== PowerPoint ========== -->
+      <Host xsi:type="Presentation">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title" />
+            <Description resid="GetStarted.Description" />
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl" />
+          </GetStarted>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="HankoGroup.PowerPoint">
+                <Label resid="HankoGroup.Label" />
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16" />
+                  <bt:Image size="32" resid="Icon.32x32" />
+                  <bt:Image size="80" resid="Icon.80x80" />
+                </Icon>
+                <Control xsi:type="Button" id="HankoButton.PowerPoint">
                   <Label resid="HankoButton.Label" />
                   <Supertip>
                     <Title resid="HankoButton.Label" />

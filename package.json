@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Japanese electronic stamp (Hanko/Data-in) add-in for Excel",
   "scripts": {
-    "start": "npx office-addin-dev-certs install && npx http-server src -p 3000 -S -C C:/Users/highd/.office-addin-dev-certs/localhost.crt -K C:/Users/highd/.office-addin-dev-certs/localhost.key --cors"
+    "start": "npx office-addin-dev-certs install && npx http-server src -p 3000 -S -C %USERPROFILE%/.office-addin-dev-certs/localhost.crt -K %USERPROFILE%/.office-addin-dev-certs/localhost.key --cors"
   },
   "devDependencies": {
     "http-server": "^14.1.1",

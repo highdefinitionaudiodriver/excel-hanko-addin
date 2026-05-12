@@ -1,6 +1,7 @@
 /* ==========================================================
  *  電子印鑑 (Hanko / Data-in) — taskpane.js
- *  Canvas で日本式データ印画像を生成し、Excel に挿入する
+ *  Canvas で日本式データ印画像を生成し、
+ *  Excel / Word / PowerPoint に挿入する
  * ========================================================== */
 
 // ---------- 定数 ----------
@@ -13,9 +14,19 @@ const TRACKING_FONT_SIZE = 8;      // トラッキングID 文字サイズ (px)
 // ---------- DOM 要素 ----------
 let topTextEl, midTextEl, bottomTextEl, btnStamp, statusEl, canvas, ctx;
 
+// ---------- ホストアプリ ----------
+let currentHost = null;
+
 // ---------- Office 初期化 ----------
 Office.onReady(function (info) {
-  if (info.host === Office.HostType.Excel) {
+  currentHost = info.host;
+
+  // Excel / Word / PowerPoint いずれでも起動
+  if (
+    info.host === Office.HostType.Excel ||
+    info.host === Office.HostType.Word ||
+    info.host === Office.HostType.PowerPoint
+  ) {
     initUI();
   }
 });
@@ -37,10 +48,30 @@ function initUI() {
     el.addEventListener("input", drawPreview);
   });
 
+  // ホスト名を表示
+  updateHostLabel();
+
   btnStamp.disabled = false;
   btnStamp.addEventListener("click", onStamp);
 
   drawPreview();
+}
+
+// ---------- ホスト名表示 ----------
+function getHostDisplayName() {
+  switch (currentHost) {
+    case Office.HostType.Excel:      return "Excel";
+    case Office.HostType.Word:       return "Word";
+    case Office.HostType.PowerPoint: return "PowerPoint";
+    default:                         return "Office";
+  }
+}
+
+function updateHostLabel() {
+  var hostLabel = document.getElementById("host-label");
+  if (hostLabel) {
+    hostLabel.textContent = getHostDisplayName() + " で動作中";
+  }
 }
 
 // ---------- トラッキングID生成 ----------
@@ -99,7 +130,6 @@ function drawStamp(c, size, top, mid, bottom, trackingId) {
   c.stroke();
 
   // --- 横線 (3分割) ---
-  // 円内を均等に3分割: y座標は中心 ± radius/3
   var divY1 = cy - radius / 3;
   var divY2 = cy + radius / 3;
 
@@ -111,11 +141,10 @@ function drawStamp(c, size, top, mid, bottom, trackingId) {
   c.textBaseline = "middle";
 
   // 上段
-  var topY = cy - radius * 2 / 3;
-  var topAreaH = radius / 3 * 2 / 1;  // 上端 〜 divY1
+  var topAreaH = radius / 3 * 2 / 1;
   drawFittedText(c, top, cx, (cy - radius + divY1) / 2, radius, topAreaH);
 
-  // 中段 (日付 — 小さめフォント)
+  // 中段 (日付)
   drawFittedText(c, mid, cx, cy, radius, divY2 - divY1, true);
 
   // 下段
@@ -128,7 +157,6 @@ function drawStamp(c, size, top, mid, bottom, trackingId) {
     c.font = TRACKING_FONT_SIZE + "px 'Consolas', 'Courier New', monospace";
     c.textAlign = "right";
     c.textBaseline = "top";
-    // 円の右下 45° の接線付近に配置
     var idX = cx + radius * 0.72;
     var idY = cy + radius * 0.72;
     c.fillText(trackingId, idX, idY);
@@ -150,12 +178,10 @@ function drawChordLine(c, cx, cy, r, y) {
 
 /**
  * 領域に収まるようフォントサイズを自動調整してテキストを描画
- * @param {boolean} isDate 日付行かどうか
  */
 function drawFittedText(c, text, x, y, maxWidth, areaHeight, isDate) {
   if (!text) return;
 
-  // 使用可能幅は円弦の幅よりやや狭く
   var usableWidth = maxWidth * 1.4;
   var fontSize = Math.floor(areaHeight * 0.65);
   if (fontSize < 8) fontSize = 8;
@@ -164,7 +190,6 @@ function drawFittedText(c, text, x, y, maxWidth, areaHeight, isDate) {
     ? "'Consolas', 'Courier New', monospace"
     : "'Meiryo', 'Yu Gothic', 'Hiragino Sans', sans-serif";
 
-  // フォントサイズを縮小しながらフィッティング
   for (; fontSize >= 8; fontSize -= 1) {
     c.font = "bold " + fontSize + "px " + fontFamily;
     if (c.measureText(text).width <= usableWidth) break;
@@ -174,7 +199,9 @@ function drawFittedText(c, text, x, y, maxWidth, areaHeight, isDate) {
   c.fillText(text, x, y);
 }
 
-// ---------- 押印 (Excel 挿入) ----------
+// ==========================================================
+//  押印 (メイン処理)
+// ==========================================================
 function onStamp() {
   setStatus("", "");
   btnStamp.disabled = true;
@@ -197,13 +224,17 @@ function onStamp() {
     trackingId
   );
 
-  // Base64 PNG (data:image/png;base64,... のプレフィックスを除去)
+  // Base64 PNG
   var dataUrl = offCanvas.toDataURL("image/png");
   var base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
 
-  insertImageToExcel(base64)
+  // ホストに応じた挿入処理を呼び出し
+  insertStampImage(base64)
     .then(function () {
-      setStatus("押印しました (ID: " + trackingId + ")", "success");
+      setStatus(
+        "文書に押印しました (ID: " + trackingId + ")",
+        "success"
+      );
     })
     .catch(function (err) {
       console.error(err);
@@ -214,10 +245,28 @@ function onStamp() {
     });
 }
 
-/**
- * Base64 PNG 画像をアクティブセルに挿入する
- */
-function insertImageToExcel(base64) {
+// ==========================================================
+//  ホスト別 画像挿入ルーター
+// ==========================================================
+function insertStampImage(base64) {
+  switch (currentHost) {
+    case Office.HostType.Excel:
+      return insertIntoExcel(base64);
+    case Office.HostType.Word:
+      return insertIntoWord(base64);
+    case Office.HostType.PowerPoint:
+      return insertIntoPowerPoint(base64);
+    default:
+      return Promise.reject(
+        new Error("未対応のホストアプリケーションです: " + currentHost)
+      );
+  }
+}
+
+// ==========================================================
+//  Excel: アクティブセルの位置にシェイプとして挿入
+// ==========================================================
+function insertIntoExcel(base64) {
   return Excel.run(function (context) {
     var sheet = context.workbook.worksheets.getActiveWorksheet();
     var range = context.workbook.getSelectedRange();
@@ -236,6 +285,52 @@ function insertImageToExcel(base64) {
 
       return context.sync();
     });
+  });
+}
+
+// ==========================================================
+//  Word: カーソル位置にインライン画像として挿入
+// ==========================================================
+function insertIntoWord(base64) {
+  return Word.run(function (context) {
+    var selection = context.document.getSelection();
+
+    // Word の insertInlinePictureFromBase64:
+    //   第1引数: Base64文字列
+    //   第2引数: 挿入位置 ("Replace" | "Start" | "End" | "Before" | "After")
+    var picture = selection.insertInlinePictureFromBase64(base64, "Replace");
+
+    // サイズ設定 (ポイント単位)
+    var sizePt = INSERT_SIZE_PX * 0.75;
+    picture.width = sizePt;
+    picture.height = sizePt;
+    picture.lockAspectRatio = true;
+
+    return context.sync();
+  });
+}
+
+// ==========================================================
+//  PowerPoint: 共通API で選択スライドに画像を挿入
+// ==========================================================
+function insertIntoPowerPoint(base64) {
+  return new Promise(function (resolve, reject) {
+    // Office 共通 API — setSelectedDataAsync + CoercionType.Image
+    Office.context.document.setSelectedDataAsync(
+      base64,
+      {
+        coercionType: Office.CoercionType.Image,
+        imageWidth: INSERT_SIZE_PX,
+        imageHeight: INSERT_SIZE_PX
+      },
+      function (result) {
+        if (result.status === Office.AsyncResultStatus.Succeeded) {
+          resolve();
+        } else {
+          reject(new Error(result.error.message));
+        }
+      }
+    );
   });
 }
 
