@@ -15,6 +15,12 @@ const TRACKING_FONT_SIZE = 8;      // トラッキングID 文字サイズ (px)
 let topTextEl, midTextEl, bottomTextEl, btnStamp, statusEl, canvas, ctx;
 let btnExportCsv, btnClearAudit, auditCountEl;
 
+// 印影スタイル (circle / square / stamp)
+function getSelectedShape() {
+  var selected = document.querySelector('input[name="shape"]:checked');
+  return selected ? selected.value : "circle";
+}
+
 // ---------- 証跡 (audit log) localStorage キー ----------
 const AUDIT_LOG_KEY = "hanko_audit_log_v1";
 
@@ -50,6 +56,11 @@ function initUI() {
   // 入力変更でプレビュー更新
   [topTextEl, midTextEl, bottomTextEl].forEach(function (el) {
     el.addEventListener("input", drawPreview);
+  });
+
+  // 印影スタイル変更でプレビュー更新
+  document.querySelectorAll('input[name="shape"]').forEach(function (el) {
+    el.addEventListener("change", drawPreview);
   });
 
   // ホスト名を表示
@@ -112,23 +123,26 @@ function drawPreview() {
     STAMP_SIZE,
     topTextEl.value,
     midTextEl.value,
-    bottomTextEl.value
+    bottomTextEl.value,
+    null,
+    getSelectedShape()
   );
 }
 
 /**
- * Canvas にデータ印を描画する
+ * Canvas にデータ印を描画する（3 形状対応）
  * @param {CanvasRenderingContext2D} c
  * @param {number} size  - Canvas の幅・高さ
  * @param {string} top   - 上段テキスト
  * @param {string} mid   - 中段テキスト (日付)
  * @param {string} bottom - 下段テキスト
  * @param {string} [trackingId] - トラッキングID（省略時は描画しない）
+ * @param {string} [shape] - 印影形状 "circle" / "square" / "stamp"（既定: circle）
  */
-function drawStamp(c, size, top, mid, bottom, trackingId) {
+function drawStamp(c, size, top, mid, bottom, trackingId, shape) {
+  shape = shape || "circle";
   var cx = size / 2;
   var cy = size / 2;
-  var radius = size / 2 - 6;       // 余白を確保
   var lineWidth = 3;
 
   c.clearRect(0, 0, size, size);
@@ -136,31 +150,17 @@ function drawStamp(c, size, top, mid, bottom, trackingId) {
   c.fillStyle = STAMP_COLOR;
   c.lineWidth = lineWidth;
 
-  // --- 外枠 (円) ---
-  c.beginPath();
-  c.arc(cx, cy, radius, 0, Math.PI * 2);
-  c.stroke();
-
-  // --- 横線 (3分割) ---
-  var divY1 = cy - radius / 3;
-  var divY2 = cy + radius / 3;
-
-  drawChordLine(c, cx, cy, radius, divY1);
-  drawChordLine(c, cx, cy, radius, divY2);
-
-  // --- テキスト描画 ---
-  c.textAlign = "center";
-  c.textBaseline = "middle";
-
-  // 上段
-  var topAreaH = radius / 3 * 2 / 1;
-  drawFittedText(c, top, cx, (cy - radius + divY1) / 2, radius, topAreaH);
-
-  // 中段 (日付)
-  drawFittedText(c, mid, cx, cy, radius, divY2 - divY1, true);
-
-  // 下段
-  drawFittedText(c, bottom, cx, (divY2 + cy + radius) / 2, radius, topAreaH);
+  // 形状ごとに描画ヘルパーを切り替え
+  if (shape === "square") {
+    drawSquareFrame_(c, size, cx, cy);
+    drawSquareBody_(c, size, cx, cy, top, mid, bottom);
+  } else if (shape === "stamp") {
+    drawStampFrame_(c, size, cx, cy);
+    drawStampBody_(c, size, cx, cy, top, mid, bottom);
+  } else {
+    drawCircleFrame_(c, size, cx, cy);
+    drawCircleBody_(c, size, cx, cy, top, mid, bottom);
+  }
 
   // --- トラッキングID (右下に極小グレー文字) ---
   if (trackingId) {
@@ -169,11 +169,85 @@ function drawStamp(c, size, top, mid, bottom, trackingId) {
     c.font = TRACKING_FONT_SIZE + "px 'Consolas', 'Courier New', monospace";
     c.textAlign = "right";
     c.textBaseline = "top";
-    var idX = cx + radius * 0.72;
-    var idY = cy + radius * 0.72;
-    c.fillText(trackingId, idX, idY);
+    var pad = size * 0.06;
+    c.fillText(trackingId, size - pad, size - pad - TRACKING_FONT_SIZE);
     c.restore();
   }
+}
+
+// ── 丸印 (既存ロジック踏襲) ───────────────────────────────────────
+function drawCircleFrame_(c, size, cx, cy) {
+  var radius = size / 2 - 6;
+  c.beginPath();
+  c.arc(cx, cy, radius, 0, Math.PI * 2);
+  c.stroke();
+}
+function drawCircleBody_(c, size, cx, cy, top, mid, bottom) {
+  var radius = size / 2 - 6;
+  var divY1 = cy - radius / 3;
+  var divY2 = cy + radius / 3;
+  drawChordLine(c, cx, cy, radius, divY1);
+  drawChordLine(c, cx, cy, radius, divY2);
+  c.textAlign = "center";
+  c.textBaseline = "middle";
+  var topAreaH = radius / 3 * 2 / 1;
+  drawFittedText(c, top,    cx, (cy - radius + divY1) / 2, radius, topAreaH);
+  drawFittedText(c, mid,    cx, cy,                         radius, divY2 - divY1, true);
+  drawFittedText(c, bottom, cx, (divY2 + cy + radius) / 2,  radius, topAreaH);
+}
+
+// ── 角印 (正方形) ─────────────────────────────────────────────────
+function drawSquareFrame_(c, size, cx, cy) {
+  var half = size / 2 - 6;
+  c.strokeRect(cx - half, cy - half, half * 2, half * 2);
+}
+function drawSquareBody_(c, size, cx, cy, top, mid, bottom) {
+  var half = size / 2 - 6;
+  var divY1 = cy - half / 3;
+  var divY2 = cy + half / 3;
+  // 水平区切り (フレーム内一杯)
+  c.beginPath(); c.moveTo(cx - half, divY1); c.lineTo(cx + half, divY1); c.stroke();
+  c.beginPath(); c.moveTo(cx - half, divY2); c.lineTo(cx + half, divY2); c.stroke();
+  c.textAlign = "center";
+  c.textBaseline = "middle";
+  var areaH = (half * 2) / 3;
+  drawFittedText(c, top,    cx, cy - half + areaH / 2, half * 1.4, areaH);
+  drawFittedText(c, mid,    cx, cy,                    half * 1.4, areaH, true);
+  drawFittedText(c, bottom, cx, cy + half - areaH / 2, half * 1.4, areaH);
+}
+
+// ── スタンプ風 (角丸＋影なし、横長気味) ───────────────────────────
+function drawStampFrame_(c, size, cx, cy) {
+  var w = size / 2 - 4;   // 横幅大きめ
+  var h = size / 2.4;     // 縦幅やや小さめ → 横長感
+  var r = h * 0.18;        // 角丸半径
+  c.beginPath();
+  // 角丸矩形
+  c.moveTo(cx - w + r, cy - h);
+  c.lineTo(cx + w - r, cy - h);
+  c.quadraticCurveTo(cx + w, cy - h, cx + w, cy - h + r);
+  c.lineTo(cx + w, cy + h - r);
+  c.quadraticCurveTo(cx + w, cy + h, cx + w - r, cy + h);
+  c.lineTo(cx - w + r, cy + h);
+  c.quadraticCurveTo(cx - w, cy + h, cx - w, cy + h - r);
+  c.lineTo(cx - w, cy - h + r);
+  c.quadraticCurveTo(cx - w, cy - h, cx - w + r, cy - h);
+  c.closePath();
+  c.stroke();
+}
+function drawStampBody_(c, size, cx, cy, top, mid, bottom) {
+  var w = size / 2 - 4;
+  var h = size / 2.4;
+  var divY1 = cy - h / 3;
+  var divY2 = cy + h / 3;
+  c.beginPath(); c.moveTo(cx - w, divY1); c.lineTo(cx + w, divY1); c.stroke();
+  c.beginPath(); c.moveTo(cx - w, divY2); c.lineTo(cx + w, divY2); c.stroke();
+  c.textAlign = "center";
+  c.textBaseline = "middle";
+  var areaH = (h * 2) / 3;
+  drawFittedText(c, top,    cx, cy - h + areaH / 2, w * 1.8, areaH);
+  drawFittedText(c, mid,    cx, cy,                  w * 1.8, areaH, true);
+  drawFittedText(c, bottom, cx, cy + h - areaH / 2, w * 1.8, areaH);
 }
 
 /**
@@ -233,7 +307,8 @@ function onStamp() {
     topTextEl.value,
     midTextEl.value,
     bottomTextEl.value,
-    trackingId
+    trackingId,
+    getSelectedShape()
   );
 
   // Base64 PNG
@@ -252,6 +327,7 @@ function onStamp() {
         trackingId: trackingId,
         timestamp: new Date().toISOString(),
         host: getHostDisplayName(),
+        shape: getSelectedShape(),
         topText: topTextEl.value || "",
         midText: midTextEl.value || "",
         bottomText: bottomTextEl.value || ""
@@ -421,6 +497,7 @@ function buildAuditCsv(log) {
     "timestamp_iso8601",
     "tracking_id",
     "host_app",
+    "shape",
     "top_text",
     "middle_text",
     "bottom_text"
@@ -431,6 +508,7 @@ function buildAuditCsv(log) {
       csvCell(e.timestamp),
       csvCell(e.trackingId),
       csvCell(e.host),
+      csvCell(e.shape || "circle"),
       csvCell(e.topText),
       csvCell(e.midText),
       csvCell(e.bottomText)
