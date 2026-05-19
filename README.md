@@ -3,6 +3,23 @@
 日本式の電子印鑑（データ印）を Excel に挿入する Office Web アドインです。
 Excel Online（Web版）およびデスクトップ版 Excel の両方で動作します。
 
+---
+
+## 🎯 これは何？（30秒で）
+
+- **誰のため**：脱ハンコを進めたい中小企業／在宅勤務で書類押印が手間な総務・経理担当
+- **何が解決される**：紙の書類に印鑑を押すために出社・郵送する非効率を、**Excel ファイル内でワンクリック押印**に置き換える。日付・部署・氏名を含む日本式データ印を Canvas で動的生成し PNG として挿入
+- **なぜ既存ツールではダメか**：商用電子印鑑サービスは法人課金が前提。本ツールは **Office Web アドイン**として無料配布可能で、AppSource 経由で組織にも個人にも展開できる
+- **使う条件**：Excel Online または Excel デスクトップ版 (Microsoft 365)
+
+## 💰 想定ユースケース・価格帯
+
+| 用途 | 形態 |
+|---|---|
+| 個人利用 | 無料（MIT） |
+| 法人利用（証跡 CSV エクスポート・部署一括展開・印影バリエーション） | 今後の有料機能として検討 |
+| カスタマイズ・社内テンプレ統一・SSO 連携 | 応相談 |
+
 ![Office Add-in](https://img.shields.io/badge/Office-Add--in-blue)
 ![Platform](https://img.shields.io/badge/Platform-Excel%20Online%20%7C%20Desktop-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
@@ -148,3 +165,11 @@ const TRACKING_FONT_SIZE = 8;      // トラッキングID の文字サイズ (p
 ## ライセンス
 
 MIT
+
+---
+
+## 🤝 商用利用・カスタマイズ依頼
+
+- 個人利用は無料（MIT ライセンス）
+- 法人導入支援、カスタマイズ、業務テンプレ整備、追加機能開発は応相談
+- 連絡先：highdefinitionaudiodriver@gmail.com
