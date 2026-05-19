@@ -98,6 +98,52 @@
 
     .status-success { color: #2e7d32; }
     .status-error { color: #c62828; }
+
+    /* === 証跡 (Audit log) パネル === */
+    .audit-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px dashed #ddd;
+    }
+    .audit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .audit-header h2 {
+      font-size: 12px;
+      font-weight: bold;
+      color: #555;
+    }
+    .audit-count {
+      font-size: 11px;
+      color: #888;
+    }
+    .audit-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-secondary {
+      flex: 1;
+      padding: 7px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #333;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-secondary:hover { background: #e0e0e0; }
+    .btn-secondary:disabled {
+      color: #aaa;
+      cursor: not-allowed;
+      background: #f7f7f7;
+    }
+    .btn-secondary.danger { color: #b71c1c; }
+    .btn-secondary.danger:hover { background: #ffebee; }
   </style>
 </head>
 <body>
@@ -126,6 +172,24 @@
   <div class="preview-area">
     <p>プレビュー</p>
     <canvas id="preview-canvas" width="200" height="200"></canvas>
+  </div>
+
+  <!-- ====================================================== -->
+  <!--   証跡 (Audit log) — 法人利用向け                       -->
+  <!-- ====================================================== -->
+  <div class="audit-section">
+    <div class="audit-header">
+      <h2>📋 押印履歴（証跡）</h2>
+      <span class="audit-count" id="audit-count">0 件</span>
+    </div>
+    <div class="audit-actions">
+      <button class="btn-secondary" id="btn-export-csv" disabled>CSV 出力</button>
+      <button class="btn-secondary danger" id="btn-clear-audit" disabled>履歴クリア</button>
+    </div>
+    <p style="font-size:10px;color:#999;margin-top:6px;line-height:1.4">
+      この端末（ブラウザ）に保存されます。<br>
+      クラウド同期・部署一括展開は法人プランで対応。
+    </p>
   </div>
 
   <script src="taskpane.js"></script>
