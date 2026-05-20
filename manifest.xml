@@ -12,9 +12,9 @@
   <DefaultLocale>ja-jp</DefaultLocale>
   <DisplayName DefaultValue="電子印鑑 (Hanko)" />
   <Description DefaultValue="日本式のデータ印（電子印鑑）をExcel・Word・PowerPointに挿入するアドインです。" />
-  <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png" />
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png" />
-  <SupportUrl DefaultValue="https://localhost:3000" />
+  <IconUrl DefaultValue="https://highdefinitionaudiodriver.github.io/excel-hanko-addin/src/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://highdefinitionaudiodriver.github.io/excel-hanko-addin/src/assets/icon-32.png" />
+  <SupportUrl DefaultValue="https://github.com/highdefinitionaudiodriver/excel-hanko-addin/issues" />
 
   <Hosts>
     <Host Name="Workbook" />
@@ -23,7 +23,7 @@
   </Hosts>
 
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://localhost:3000/taskpane.html" />
+    <SourceLocation DefaultValue="https://highdefinitionaudiodriver.github.io/excel-hanko-addin/src/taskpane.html" />
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
@@ -150,13 +150,13 @@
 
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/assets/icon-16.png" />
-        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/assets/icon-32.png" />
-        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/assets/icon-80.png" />
+        <bt:Image id="Icon.16x16" DefaultValue="https://highdefinitionaudiodriver.github.io/excel-hanko-addin/src/assets/icon-32.png" />
+        <bt:Image id="Icon.32x32" DefaultValue="https://highdefinitionaudiodriver.github.io/excel-hanko-addin/src/assets/icon-32.png" />
+        <bt:Image id="Icon.80x80" DefaultValue="https://highdefinitionaudiodriver.github.io/excel-hanko-addin/src/assets/icon-32.png" />
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/taskpane.html" />
-        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://localhost:3000" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://highdefinitionaudiodriver.github.io/excel-hanko-addin/src/taskpane.html" />
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://github.com/highdefinitionaudiodriver/excel-hanko-addin#readme" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="電子印鑑アドイン" />

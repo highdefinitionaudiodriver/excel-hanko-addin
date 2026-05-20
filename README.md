@@ -24,6 +24,11 @@ Excel Online（Web版）およびデスクトップ版 Excel の両方で動作�
 ![Platform](https://img.shields.io/badge/Platform-Excel%20Online%20%7C%20Desktop-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
+## 🎬 デモ
+
+<!-- docs/demo.gif に「アドイン起動 → 印影設定 → Excel/Word/PowerPointへの押印 → 証跡CSVエクスポート」までの30秒デモGIFを配置してください。 -->
+![Excel Hanko Add-in demo](docs/demo.gif)
+
 ## 機能
 
 - 丸型の日本式データ印（電子印鑑）を Canvas で動的生成
@@ -71,6 +76,13 @@ Excel Online（Web版）およびデスクトップ版 Excel の両方で動作�
 | Office.js (Excel.js API) | Excel へのシェイプ（画像）挿入 |
 | Web Crypto API | トラッキングID の乱数生成 |
 | Node.js / http-server | ローカル HTTPS 開発サーバー |
+
+## AppSource 審査前チェック
+
+- `manifest.xml` の URL は GitHub Pages 公開先（`https://highdefinitionaudiodriver.github.io/excel-hanko-addin/`）を想定
+- GitHub Pages は `main` ブランチのリポジトリルート公開に設定
+- 現状のアイコンはプレースホルダ。AppSource提出前に 16/32/80px と高解像度アイコンを正式PNGへ差し替え
+- サポートURLは GitHub Issues、プライバシーポリシーはリポジトリREADME/SECURITYから提出画面に登録
 
 ## プロジェクト構成
 
