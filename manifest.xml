@@ -7,7 +7,7 @@
   xsi:type="TaskPaneApp">
 
   <Id>bf25dd60-f0cf-41f7-822c-8bfbe671f52e</Id>
-  <Version>1.1.0.0</Version>
+  <Version>1.2.0.0</Version>
   <ProviderName>Hanko Add-in Developer</ProviderName>
   <DefaultLocale>ja-jp</DefaultLocale>
   <DisplayName DefaultValue="電子印鑑 (Hanko)" />

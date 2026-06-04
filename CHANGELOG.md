@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-04
+
 ### Added
 - README に「これは何？（30秒で）」「想定ユースケース・価格帯」セクションを追加
 - SECURITY.md を追加（脆弱性報告フロー）
