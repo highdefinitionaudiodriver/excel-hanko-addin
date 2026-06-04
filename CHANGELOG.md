@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - スタンプ風は角丸長方形（横長）で部署印・会社印を想定
   - 証跡 CSV に `shape` 列を追加（どの形状で押印したか監査可能）
 
+### Fixed
+- manifest.xml の `<Id>` がプレースホルダ GUID（`a1b2c3d4-...`）のままだったのを正規 GUID に置換（AppSource 提出時の検証エラー回避・他アドインとの ID 衝突防止）
+
+### Changed
+- 証跡 CSV 生成ロジック（`csvCell` / `buildAuditCsv`）をブラウザ/Node 両対応モジュール `src/audit-csv.js` に切り出し、taskpane.js から共有
+- 単体テスト `tests/audit-csv.test.mjs`（9ケース）と `npm test` を追加。RFC4180 エスケープ・UTF-8 BOM・CRLF・shape 既定値などを検証
+
 ## [0.1.0]
 
 ### Added

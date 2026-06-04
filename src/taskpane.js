@@ -478,44 +478,10 @@ function refreshAuditUi() {
   if (btnClearAudit) btnClearAudit.disabled = log.length === 0;
 }
 
-/**
- * CSV 1セルの文字列を RFC4180 風にエスケープ
- *  - ダブルクォート / カンマ / 改行を含む値はダブルクォートで囲む
- *  - 値中のダブルクォートは "" にエスケープ
- */
-function csvCell(value) {
-  if (value == null) return "";
-  var s = String(value);
-  if (/[",\r\n]/.test(s)) {
-    return '"' + s.replace(/"/g, '""') + '"';
-  }
-  return s;
-}
-
+// CSV 生成は共有モジュール audit-csv.js (window.HankoAudit) に集約。
+// taskpane.html で本ファイルより前に読み込まれている前提。
 function buildAuditCsv(log) {
-  var headers = [
-    "timestamp_iso8601",
-    "tracking_id",
-    "host_app",
-    "shape",
-    "top_text",
-    "middle_text",
-    "bottom_text"
-  ];
-  var lines = [headers.join(",")];
-  log.forEach(function (e) {
-    lines.push([
-      csvCell(e.timestamp),
-      csvCell(e.trackingId),
-      csvCell(e.host),
-      csvCell(e.shape || "circle"),
-      csvCell(e.topText),
-      csvCell(e.midText),
-      csvCell(e.bottomText)
-    ].join(","));
-  });
-  // CRLF + 末尾改行（Excel での文字化け回避のため UTF-8 BOM を先頭に）
-  return "﻿" + lines.join("\r\n") + "\r\n";
+  return HankoAudit.buildAuditCsv(log);
 }
 
 function onExportAuditCsv() {
